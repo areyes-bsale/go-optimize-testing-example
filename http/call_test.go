@@ -35,3 +35,26 @@ func TestCallImprovedInterfaced(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func BenchmarkCallImproved(b *testing.B) {
+	ctx := context.Background()
+
+	headers := map[string]interface{}{
+		"Content-Type": "application/json; charset=utf-8",
+	}
+
+	w := httptest.NewRecorder()
+
+	client := mockClient{
+		do: func(req *http.Request) (*http.Response, error) {
+			//api.MyHandler(w, req)
+			return w.Result(), nil
+		},
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i <= b.N; i++ {
+		_, _ = CallImprovedInterfaced(ctx, client, "http://localhost:3000/miep", http.MethodGet, nil, headers)
+	}
+}
